@@ -6,668 +6,150 @@
 <title>Flash Attention Animation</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #0d1117;
-    color: #e0e0e0;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    padding: 16px;
-  }
+  body { background: #0d1117; color: #e0e0e0; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 16px; }
   h1 { font-size: 1.4rem; color: #fff; margin-bottom: 2px; }
   .subtitle { font-size: 0.8rem; color: #6b7280; margin-bottom: 14px; }
-
-  /* ── GPU container ── */
-  .gpu-wrapper {
-    width: 100%;
-    max-width: 900px;
-    position: relative;
-  }
-  .gpu-title {
-    font-size: 0.75rem;
-    color: #9ca3af;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 6px;
-    text-align: center;
-  }
-
-  /* ── GPU CHIP (top) ── */
-  .gpu-chip {
-    background: #111827;
-    border: 2px solid #22d3ee;
-    border-radius: 14px;
-    padding: 14px 18px 12px;
-    position: relative;
-  }
-  .chip-label {
-    position: absolute;
-    top: -10px;
-    left: 18px;
-    background: #0d1117;
-    padding: 0 8px;
-    font-size: 0.7rem;
-    color: #22d3ee;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-  .sram-units {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .sram-unit {
-    background: #1e293b;
-    border: 1.5px solid #334155;
-    border-radius: 8px;
-    padding: 8px 10px;
-    min-width: 120px;
-    text-align: center;
-    transition: all 0.3s;
-  }
-  .sram-unit.active {
-    border-color: #22d3ee;
-    box-shadow: 0 0 16px rgba(34,211,238,0.25);
-  }
-  .sram-unit-title {
-    font-size: 0.6rem;
-    color: #22d3ee;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-  }
-  .sram-unit-size {
-    font-size: 0.55rem;
-    color: #6b7280;
-  }
-
-  /* ── Fused kernel panel (inside chip) ── */
-  .kernel-panel {
-    margin-top: 10px;
-    background: #0f172a;
-    border: 1.5px solid #1e3a5f;
-    border-radius: 10px;
-    padding: 10px 14px;
-    position: relative;
-  }
-  .kernel-label {
-    position: absolute;
-    top: -9px;
-    left: 14px;
-    background: #0f172a;
-    padding: 0 6px;
-    font-size: 0.6rem;
-    color: #fbbf24;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-  }
-  .kernel-steps {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-  .sram-step {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 4px 6px;
-    border-radius: 5px;
-    font-size: 0.68rem;
-    color: #6b7280;
-    transition: all 0.25s ease;
-    min-height: 26px;
-  }
-  .sram-step.active {
-    background: rgba(34,211,238,0.08);
-    color: #e2e8f0;
-    border-left: 3px solid #22d3ee;
-  }
-  .sram-step.done { color: #10b981; }
-  .step-num {
-    font-weight: 700;
-    font-size: 0.6rem;
-    min-width: 16px; height: 16px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    background: #1e293b;
-    color: #6b7280;
-    flex-shrink: 0;
-  }
+  .gpu-wrapper { width: 100%; max-width: 900px; }
+  .gpu-title { font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; text-align: center; }
+  .gpu-chip { background: #111827; border: 2px solid #22d3ee; border-radius: 14px; padding: 14px 18px 12px; position: relative; }
+  .chip-label { position: absolute; top: -10px; left: 18px; background: #0d1117; padding: 0 8px; font-size: 0.7rem; color: #22d3ee; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .sram-units { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .sram-unit { background: #1e293b; border: 1.5px solid #334155; border-radius: 8px; padding: 8px 10px; min-width: 120px; text-align: center; transition: all 0.3s; }
+  .sram-unit-title { font-size: 0.6rem; color: #22d3ee; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .sram-unit-size { font-size: 0.55rem; color: #6b7280; }
+  .kernel-panel { margin-top: 10px; background: #0f172a; border: 1.5px solid #1e3a5f; border-radius: 10px; padding: 10px 14px; position: relative; }
+  .kernel-label { position: absolute; top: -9px; left: 14px; background: #0f172a; padding: 0 6px; font-size: 0.6rem; color: #fbbf24; font-weight: 700; }
+  .kernel-steps { display: flex; flex-direction: column; gap: 3px; }
+  .sram-step { display: flex; align-items: center; gap: 7px; padding: 4px 6px; border-radius: 5px; font-size: 0.68rem; color: #6b7280; transition: all 0.25s; min-height: 26px; }
+  .sram-step.active { background: rgba(34,211,238,0.08); color: #e2e8f0; border-left: 3px solid #22d3ee; }
+  .step-num { font-weight: 700; font-size: 0.6rem; min-width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #1e293b; color: #6b7280; flex-shrink: 0; }
   .sram-step.active .step-num { background: #22d3ee; color: #0f172a; }
-  .sram-step.done .step-num { background: #10b981; color: #fff; }
   .step-detail { color: #67e8f9; font-size: 0.6rem; margin-left: auto; font-family: 'Courier New', monospace; }
-
-  /* ── Running state (inside chip) ── */
-  .running-state {
-    margin-top: 8px;
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .state-chip {
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 6px;
-    padding: 5px 10px;
-    text-align: center;
-    min-width: 90px;
-  }
-  .state-chip-label {
-    font-size: 0.55rem;
-    color: #fbbf24;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .state-chip-val {
-    font-size: 0.65rem;
-    color: #e2e8f0;
-    font-family: 'Courier New', monospace;
-    margin-top: 2px;
-  }
-
-  /* ── BUS (the bottleneck) ── */
-  .bus-section {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 0;
-    position: relative;
-  }
-  .bus-line {
-    width: 80%;
-    height: 0;
-    border-top: 2px dashed #374151;
-    position: relative;
-  }
-  .bus-badge {
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #0d1117;
-    padding: 0 10px;
-    font-size: 0.6rem;
-    color: #f87171;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  .bus-speed {
-    font-size: 0.55rem;
-    color: #6b7280;
-    text-align: center;
-    margin-top: 2px;
-  }
-
-  /* ── Data transfer animation ── */
-  .transfer-area {
-    height: 28px;
-    position: relative;
-    overflow: hidden;
-    width: 80%;
-    margin: 0 auto;
-  }
-  .data-particle {
-    position: absolute;
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    top: 10px;
-    opacity: 0;
-  }
-  .data-particle.down {
-    animation: moveDown 0.7s ease-in-out forwards;
-  }
-  .data-particle.up {
-    animation: moveUp 0.7s ease-in-out forwards;
-  }
-  @keyframes moveDown {
-    0% { top: 0; opacity: 1; }
-    100% { top: 20px; opacity: 0.3; }
-  }
-  @keyframes moveUp {
-    0% { top: 20px; opacity: 1; }
-    100% { top: 0; opacity: 0.3; }
-  }
-
-  /* ── HBM (bottom) ── */
-  .hbm-section {
-    background: #111827;
-    border: 2px solid #374151;
-    border-radius: 14px;
-    padding: 14px 18px 14px;
-    position: relative;
-  }
-  .hbm-label {
-    position: absolute;
-    top: -10px;
-    left: 18px;
-    background: #0d1117;
-    padding: 0 8px;
-    font-size: 0.7rem;
-    color: #f87171;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-  .hbm-size {
-    position: absolute;
-    top: -10px;
-    right: 18px;
-    background: #0d1117;
-    padding: 0 8px;
-    font-size: 0.6rem;
-    color: #6b7280;
-  }
-  .hbm-contents {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-  .hbm-tensor {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-  }
-  .tensor-name {
-    font-size: 0.65rem;
-    font-weight: 600;
-    color: #9ca3af;
-  }
-  .tensor-shape {
-    font-size: 0.5rem;
-    color: #6b7280;
-  }
-  .matrix-grid {
-    display: grid;
-    gap: 2px;
-  }
-  .matrix-grid.qkvo {
-    grid-template-columns: repeat(2, 26px);
-    grid-template-rows: repeat(4, 26px);
-  }
-  .cell {
-    width: 26px; height: 26px;
-    border-radius: 3px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.5rem; font-weight: 600;
-    transition: all 0.3s ease;
-  }
-  .cell.q { background: #1e40af; color: #93c5fd; }
-  .cell.k { background: #92400e; color: #fcd34d; }
-  .cell.v { background: #5b21b6; color: #c4b5fd; }
-  .cell.o { background: #1e293b; border: 1px solid #334155; color: #475569; }
-  .cell.o.written { background: #065f46; color: #6ee7b7; border-color: #10b981; }
-  .cell.dim { opacity: 0.25; }
-  .cell.active-block {
-    box-shadow: 0 0 10px rgba(255,255,255,0.35);
-    transform: scale(1.08);
-    z-index: 1;
-  }
+  .running-state { margin-top: 8px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .state-chip { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 5px 10px; text-align: center; min-width: 90px; }
+  .state-chip-label { font-size: 0.55rem; color: #fbbf24; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .state-chip-val { font-size: 0.65rem; color: #e2e8f0; font-family: 'Courier New', monospace; margin-top: 2px; }
+  .bus-section { display: flex; align-items: center; justify-content: center; padding: 6px 0; }
+  .bus-line { width: 80%; height: 0; border-top: 2px dashed #374151; position: relative; }
+  .bus-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #0d1117; padding: 0 10px; font-size: 0.6rem; color: #f87171; font-weight: 600; white-space: nowrap; }
+  .bus-speed { font-size: 0.55rem; color: #6b7280; text-align: center; margin-top: 2px; }
+  .transfer-area { height: 28px; position: relative; overflow: hidden; width: 80%; margin: 0 auto; }
+  .data-particle { position: absolute; width: 8px; height: 8px; border-radius: 50%; top: 10px; opacity: 0; }
+  .data-particle.down { animation: moveDown 0.7s ease-in-out forwards; }
+  .data-particle.up { animation: moveUp 0.7s ease-in-out forwards; }
+  @keyframes moveDown { 0% { top:0; opacity:1; } 100% { top:20px; opacity:0.3; } }
+  @keyframes moveUp { 0% { top:20px; opacity:1; } 100% { top:0; opacity:0.3; } }
+  .hbm-section { background: #111827; border: 2px solid #374151; border-radius: 14px; padding: 14px 18px; position: relative; }
+  .hbm-label { position: absolute; top: -10px; left: 18px; background: #0d1117; padding: 0 8px; font-size: 0.7rem; color: #f87171; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .hbm-size { position: absolute; top: -10px; right: 18px; background: #0d1117; padding: 0 8px; font-size: 0.6rem; color: #6b7280; }
+  .hbm-contents { display: flex; gap: 12px; justify-content: center; align-items: flex-start; flex-wrap: wrap; }
+  .hbm-tensor { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .tensor-name { font-size: 0.65rem; font-weight: 600; color: #9ca3af; }
+  .tensor-shape { font-size: 0.5rem; color: #6b7280; }
+  .matrix-grid { display: grid; gap: 2px; grid-template-columns: repeat(2, 26px); grid-template-rows: repeat(4, 26px); }
+  .cell { width: 26px; height: 26px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-weight: 600; transition: all 0.3s; }
+  .cell.q { background: #1e40af; color: #93c5fd; } .cell.k { background: #92400e; color: #fcd34d; } .cell.v { background: #5b21b6; color: #c4b5fd; }
+  .cell.o { background: #1e293b; border: 1px solid #334155; color: #475569; } .cell.o.written { background: #065f46; color: #6ee7b7; border-color: #10b981; }
+  .cell.dim { opacity: 0.25; } .cell.active-block { box-shadow: 0 0 10px rgba(255,255,255,0.35); transform: scale(1.08); z-index: 1; }
   .cell.o.writing { animation: writeFlash 0.6s ease; }
-
-  /* S and P ghost area */
-  .ghost-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    position: relative;
-  }
-  .ghost-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 26px);
-    grid-template-rows: repeat(4, 26px);
-    gap: 2px;
-    opacity: 0.12;
-  }
-  .ghost-cell {
-    width: 26px; height: 26px;
-    border-radius: 3px;
-    border: 1px dashed #ef4444;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.45rem;
-    color: #ef4444;
-  }
-  .ghost-label {
-    font-size: 0.55rem;
-    color: #ef4444;
-    font-weight: 600;
-  }
-  .ghost-x {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 2.5rem;
-    color: #ef4444;
-    font-weight: 900;
-    opacity: 0.6;
-    text-shadow: 0 0 20px rgba(239,68,68,0.5);
-    pointer-events: none;
-  }
-  .no-sp-badge {
-    text-align: center;
-    padding: 5px 10px;
-    background: rgba(239,68,68,0.06);
-    border: 1px dashed #7f1d1d;
-    border-radius: 6px;
-    font-size: 0.6rem;
-    color: #f87171;
-    font-weight: 600;
-    margin-top: 8px;
-  }
-  .no-sp-badge.success {
-    border-color: #065f46;
-    color: #10b981;
-    background: rgba(16,185,129,0.06);
-  }
-
-  /* ── Controls ── */
-  .controls {
-    display: flex;
-    gap: 8px;
-    margin-top: 12px;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  button {
-    padding: 7px 18px;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
+  .ghost-area { display: flex; flex-direction: column; align-items: center; gap: 3px; position: relative; }
+  .ghost-grid { display: grid; grid-template-columns: repeat(4, 26px); grid-template-rows: repeat(4, 26px); gap: 2px; opacity: 0.12; }
+  .ghost-cell { width: 26px; height: 26px; border-radius: 3px; border: 1px dashed #ef4444; }
+  .ghost-label { font-size: 0.55rem; color: #ef4444; font-weight: 600; }
+  .ghost-x { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 2.5rem; color: #ef4444; font-weight: 900; opacity: 0.6; pointer-events: none; }
+  .no-sp-badge { text-align: center; padding: 5px 10px; background: rgba(239,68,68,0.06); border: 1px dashed #7f1d1d; border-radius: 6px; font-size: 0.6rem; color: #f87171; font-weight: 600; margin-top: 8px; }
+  .no-sp-badge.success { border-color: #065f46; color: #10b981; background: rgba(16,185,129,0.06); }
+  .controls { display: flex; gap: 8px; margin-top: 12px; align-items: center; flex-wrap: wrap; justify-content: center; }
+  button { padding: 7px 18px; border: none; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
   button:hover { transform: translateY(-1px); }
-  .btn-play { background: #22d3ee; color: #0f172a; }
-  .btn-step { background: #334155; color: #e2e8f0; }
-  .btn-reset { background: #475569; color: #e2e8f0; }
-  .speed-control {
-    display: flex; align-items: center; gap: 5px;
-    font-size: 0.7rem; color: #6b7280;
-  }
+  .btn-play { background: #22d3ee; color: #0f172a; } .btn-step { background: #334155; color: #e2e8f0; } .btn-reset { background: #475569; color: #e2e8f0; }
+  .speed-control { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: #6b7280; }
   .speed-control input { width: 70px; accent-color: #22d3ee; }
-
-  /* ── Status bar ── */
-  .status-bar {
-    margin-top: 10px;
-    padding: 8px 14px;
-    background: #111827;
-    border: 1px solid #1e293b;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 0.75rem;
-    min-height: 36px;
-    display: flex; align-items: center; justify-content: center;
-    width: 100%;
-    max-width: 900px;
-  }
-  .sh { color: #22d3ee; font-weight: 600; }
-  .sw { color: #f87171; }
-  .sg { color: #10b981; font-weight: 600; }
-
-  .counter {
-    font-size: 0.65rem; color: #6b7280; text-align: center; margin-top: 4px;
-  }
+  .status-bar { margin-top: 10px; padding: 8px 14px; background: #111827; border: 1px solid #1e293b; border-radius: 8px; text-align: center; font-size: 0.75rem; min-height: 36px; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 900px; }
+  .sh { color: #22d3ee; font-weight: 600; } .sw { color: #f87171; } .sg { color: #10b981; font-weight: 600; }
+  .counter { font-size: 0.65rem; color: #6b7280; text-align: center; margin-top: 4px; }
   .counter span { color: #fbbf24; font-weight: 700; }
-
-  .legend {
-    display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap; justify-content: center;
-  }
+  .legend { display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
   .legend-item { display: flex; align-items: center; gap: 4px; font-size: 0.6rem; color: #6b7280; }
   .legend-swatch { width: 12px; height: 12px; border-radius: 2px; }
-
-  @keyframes writeFlash {
-    0% { box-shadow: 0 0 0 rgba(16,185,129,0); }
-    50% { box-shadow: 0 0 14px rgba(16,185,129,0.7); }
-    100% { box-shadow: 0 0 0 rgba(16,185,129,0); }
-  }
-  @keyframes pulseGlow {
-    0%,100% { box-shadow: 0 0 8px rgba(34,211,238,0.15); }
-    50% { box-shadow: 0 0 20px rgba(34,211,238,0.4); }
-  }
-  .sram-unit.computing {
-    animation: pulseGlow 0.8s ease-in-out infinite;
-    border-color: #22d3ee;
-  }
-
-  /* ── S_block visualization in SRAM ── */
-  .sblock-area {
-    margin-top: 8px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: center;
-    min-height: 62px;
-  }
-  .sblock-label {
-    font-size: 0.6rem;
-    color: #67e8f9;
-    font-weight: 600;
-    text-align: right;
-    min-width: 50px;
-  }
-  .sblock-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 44px);
-    grid-template-rows: repeat(2, 24px);
-    gap: 2px;
-    transition: all 0.3s;
-  }
-  .sblock-cell {
-    width: 44px; height: 24px;
-    border-radius: 3px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.55rem; font-weight: 600;
-    font-family: 'Courier New', monospace;
-    background: #1e293b;
-    border: 1px solid #334155;
-    color: #475569;
-    transition: all 0.3s;
-  }
-  .sblock-cell.filled {
-    background: #164e63;
-    border-color: #22d3ee;
-    color: #67e8f9;
-  }
-  .sblock-cell.consumed {
-    background: #1e293b;
-    border-color: #7f1d1d;
-    color: #f87171;
-    text-decoration: line-through;
-    opacity: 0.7;
-  }
-  .sblock-status {
-    font-size: 0.55rem;
-    color: #6b7280;
-    min-width: 80px;
-  }
-  .sblock-status.live { color: #22d3ee; }
-  .sblock-status.gone { color: #f87171; }
+  @keyframes writeFlash { 0% { box-shadow: 0 0 0 rgba(16,185,129,0); } 50% { box-shadow: 0 0 14px rgba(16,185,129,0.7); } 100% { box-shadow: 0 0 0 rgba(16,185,129,0); } }
+  @keyframes pulseGlow { 0%,100% { box-shadow: 0 0 8px rgba(34,211,238,0.15); } 50% { box-shadow: 0 0 20px rgba(34,211,238,0.4); } }
+  .sram-unit.computing { animation: pulseGlow 0.8s ease-in-out infinite; border-color: #22d3ee; }
+  .sblock-area { margin-top: 8px; display: flex; align-items: center; gap: 10px; justify-content: center; min-height: 62px; }
+  .sblock-label { font-size: 0.6rem; color: #67e8f9; font-weight: 600; text-align: right; min-width: 50px; }
+  .sblock-grid { display: grid; grid-template-columns: repeat(2, 44px); grid-template-rows: repeat(2, 24px); gap: 2px; }
+  .sblock-cell { width: 44px; height: 24px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 600; font-family: 'Courier New', monospace; background: #1e293b; border: 1px solid #334155; color: #475569; transition: all 0.3s; }
+  .sblock-cell.filled { background: #164e63; border-color: #22d3ee; color: #67e8f9; }
+  .sblock-cell.consumed { background: #1e293b; border-color: #7f1d1d; color: #f87171; text-decoration: line-through; opacity: 0.7; }
+  .sblock-status { font-size: 0.55rem; color: #6b7280; min-width: 80px; }
+  .sblock-status.live { color: #22d3ee; } .sblock-status.gone { color: #f87171; }
 </style>
 </head>
 <body>
-
 <h1>Flash Attention: Single Fused Kernel</h1>
 <p class="subtitle">N×N matrix never exists — scores computed & consumed block by block in SRAM</p>
-
 <div class="gpu-wrapper">
   <div class="gpu-title">Your 24 GB GPU</div>
-
-  <!-- ═══ GPU CHIP (SRAM) ═══ -->
   <div class="gpu-chip">
     <div class="chip-label">GPU Chip — On-die SRAM (~20 MB, ~19 TB/s)</div>
-
     <div class="sram-units">
-      <div class="sram-unit" id="sram-cu0">
-        <div class="sram-unit-title">Compute Unit</div>
-        <div class="sram-unit-size">SRAM ~20 MB</div>
-      </div>
-      <div class="sram-unit" id="sram-cu1">
-        <div class="sram-unit-title">Compute Unit</div>
-        <div class="sram-unit-size">SRAM ~20 MB</div>
-      </div>
-      <div class="sram-unit" id="sram-cu2">
-        <div class="sram-unit-title">Compute Unit</div>
-        <div class="sram-unit-size">SRAM ~20 MB</div>
-      </div>
+      <div class="sram-unit"><div class="sram-unit-title">Compute Unit</div><div class="sram-unit-size">SRAM ~20 MB</div></div>
+      <div class="sram-unit"><div class="sram-unit-title">Compute Unit</div><div class="sram-unit-size">SRAM ~20 MB</div></div>
+      <div class="sram-unit"><div class="sram-unit-title">Compute Unit</div><div class="sram-unit-size">SRAM ~20 MB</div></div>
     </div>
-
-    <!-- Fused kernel -->
     <div class="kernel-panel">
       <div class="kernel-label">⚡ Single Fused Kernel (Flash Attention)</div>
-      <div id="pass-indicator" style="font-size:0.6rem; color:#fbbf24; text-align:center; margin-bottom:4px; font-weight:600; min-height:1em;"></div>
+      <div id="pass-indicator" style="font-size:0.6rem;color:#fbbf24;text-align:center;margin-bottom:4px;font-weight:600;min-height:1em;"></div>
       <div class="kernel-steps">
-        <div class="sram-step" id="step-load">
-          <div class="step-num">1</div>
-          <div>Load Q_block, K_block, V_block into SRAM</div>
-          <div class="step-detail" id="detail-load"></div>
-        </div>
-        <div class="sram-step" id="step-score">
-          <div class="step-num">2</div>
-          <div>S_block = Q_block × K_block<sup>T</sup> / √d</div>
-          <div class="step-detail" id="detail-score"></div>
-        </div>
-        <div class="sram-step" id="step-max">
-          <div class="step-num">3</div>
-          <div>Update running max: m = max(m, m̃)</div>
-          <div class="step-detail" id="detail-max"></div>
-        </div>
-        <div class="sram-step" id="step-rescale">
-          <div class="step-num">4</div>
-          <div>Rescale previous Õ, l by exp(m_old − m_new)</div>
-          <div class="step-detail" id="detail-rescale"></div>
-        </div>
-        <div class="sram-step" id="step-accum">
-          <div class="step-num">5</div>
-          <div>Accumulate: Õ += exp(S−m) × V_block</div>
-          <div class="step-detail" id="detail-accum"></div>
-        </div>
-        <div class="sram-step" id="step-write">
-          <div class="step-num">6</div>
-          <div>After all KV blocks: O = Õ / l → write to HBM</div>
-          <div class="step-detail" id="detail-write"></div>
-        </div>
+        <div class="sram-step" id="step-load"><div class="step-num">0</div><div>Load Q_block, K_block, V_block into SRAM</div><div class="step-detail" id="detail-load"></div></div>
+        <div class="sram-step" id="step-score"><div class="step-num">1</div><div>S_block = Q_block × K_block<sup>T</sup> / √d</div><div class="step-detail" id="detail-score"></div></div>
+        <div class="sram-step" id="step-local"><div class="step-num">2</div><div>Local max m̃, local denom l̃ = Σexp(S−m̃)</div><div class="step-detail" id="detail-local"></div></div>
+        <div class="sram-step" id="step-gmax"><div class="step-num">3</div><div>Update global max: m_new = max(m, m̃)</div><div class="step-detail" id="detail-gmax"></div></div>
+        <div class="sram-step" id="step-rescale"><div class="step-num">4</div><div>Rescale: l×=exp(m−m_new), Õ×=exp(m−m_new)</div><div class="step-detail" id="detail-rescale"></div></div>
+        <div class="sram-step" id="step-accum"><div class="step-num">5</div><div>Accumulate: l+=exp(m̃−m_new)×l̃, Õ+=exp(S−m_new)×V</div><div class="step-detail" id="detail-accum"></div></div>
+        <div class="sram-step" id="step-write"><div class="step-num">6</div><div>m=m_new. After all blocks: O=Õ/l → write to HBM</div><div class="step-detail" id="detail-write"></div></div>
       </div>
-
-      <!-- S_block visualization -->
-      <div class="sblock-area" id="sblock-area">
-        <div class="sblock-label" id="sblock-title">S_block<br><span style="font-size:0.5rem;color:#475569">(2×2 in SRAM)</span></div>
+      <div class="sblock-area">
+        <div class="sblock-label">S_block<br><span style="font-size:0.5rem;color:#475569">(2×2 in SRAM)</span></div>
         <div class="sblock-grid" id="sblock-grid">
-          <div class="sblock-cell" id="sb-0-0">—</div>
-          <div class="sblock-cell" id="sb-0-1">—</div>
-          <div class="sblock-cell" id="sb-1-0">—</div>
-          <div class="sblock-cell" id="sb-1-1">—</div>
+          <div class="sblock-cell" id="sb-0-0">—</div><div class="sblock-cell" id="sb-0-1">—</div>
+          <div class="sblock-cell" id="sb-1-0">—</div><div class="sblock-cell" id="sb-1-1">—</div>
         </div>
         <div class="sblock-status" id="sblock-status">empty</div>
       </div>
-
-      <!-- Running state chips -->
       <div class="running-state">
-        <div class="state-chip">
-          <div class="state-chip-label">m (max)</div>
-          <div class="state-chip-val" id="state-m">−∞</div>
-        </div>
-        <div class="state-chip">
-          <div class="state-chip-label">l (sum)</div>
-          <div class="state-chip-val" id="state-l">0</div>
-        </div>
-        <div class="state-chip">
-          <div class="state-chip-label">Õ (accum)</div>
-          <div class="state-chip-val" id="state-o">[0, 0]</div>
-        </div>
-        <div class="state-chip">
-          <div class="state-chip-label">Q rows</div>
-          <div class="state-chip-val" id="state-qblock">—</div>
-        </div>
-        <div class="state-chip">
-          <div class="state-chip-label">KV block</div>
-          <div class="state-chip-val" id="state-kvblock">—</div>
-        </div>
+        <div class="state-chip"><div class="state-chip-label">m (max)</div><div class="state-chip-val" id="state-m">−∞</div></div>
+        <div class="state-chip"><div class="state-chip-label">l (sum)</div><div class="state-chip-val" id="state-l">0</div></div>
+        <div class="state-chip"><div class="state-chip-label">Õ (accum)</div><div class="state-chip-val" id="state-o">[0, 0]</div></div>
+        <div class="state-chip"><div class="state-chip-label">Q rows</div><div class="state-chip-val" id="state-qblock">—</div></div>
+        <div class="state-chip"><div class="state-chip-label">KV block</div><div class="state-chip-val" id="state-kvblock">—</div></div>
       </div>
     </div>
   </div>
-
-  <!-- ═══ BUS ═══ -->
-  <div class="bus-section">
-    <div class="bus-line">
-      <div class="bus-badge" id="bus-badge">↕ ~2 TB/s bandwidth — the bottleneck</div>
-    </div>
-  </div>
+  <div class="bus-section"><div class="bus-line"><div class="bus-badge">↕ ~2 TB/s bandwidth — the bottleneck</div></div></div>
   <div class="transfer-area" id="transfer-area"></div>
   <div class="bus-speed" id="bus-dir">10× slower than SRAM</div>
-
-  <!-- ═══ HBM ═══ -->
   <div class="hbm-section">
-    <div class="hbm-label">GPU Memory (HBM) — Off-chip</div>
-    <div class="hbm-size">24–80 GB</div>
-
+    <div class="hbm-label">GPU Memory (HBM) — Off-chip</div><div class="hbm-size">24–80 GB</div>
     <div class="hbm-contents">
-      <div class="hbm-tensor">
-        <div class="tensor-name">Q</div>
-        <div class="tensor-shape">N × d</div>
-        <div class="matrix-grid qkvo" id="q-grid"></div>
-      </div>
-      <div class="hbm-tensor">
-        <div class="tensor-name">K</div>
-        <div class="tensor-shape">N × d</div>
-        <div class="matrix-grid qkvo" id="k-grid"></div>
-      </div>
-      <div class="hbm-tensor">
-        <div class="tensor-name">V</div>
-        <div class="tensor-shape">N × d</div>
-        <div class="matrix-grid qkvo" id="v-grid"></div>
-      </div>
-      <div class="hbm-tensor">
-        <div class="tensor-name">O</div>
-        <div class="tensor-shape">N × d</div>
-        <div class="matrix-grid qkvo" id="o-grid"></div>
-      </div>
-
-      <!-- Ghost S and P -->
-      <div class="ghost-area" id="ghost-area">
-        <div class="ghost-label">S (N×N)</div>
-        <div class="ghost-grid" id="ghost-s">
-        </div>
-        <div class="ghost-x" id="ghost-x">✕</div>
-        <div class="ghost-label">P (N×N)</div>
-      </div>
+      <div class="hbm-tensor"><div class="tensor-name">Q</div><div class="tensor-shape">N×d</div><div class="matrix-grid" id="q-grid"></div></div>
+      <div class="hbm-tensor"><div class="tensor-name">K</div><div class="tensor-shape">N×d</div><div class="matrix-grid" id="k-grid"></div></div>
+      <div class="hbm-tensor"><div class="tensor-name">V</div><div class="tensor-shape">N×d</div><div class="matrix-grid" id="v-grid"></div></div>
+      <div class="hbm-tensor"><div class="tensor-name">O</div><div class="tensor-shape">N×d</div><div class="matrix-grid" id="o-grid"></div></div>
+      <div class="ghost-area"><div class="ghost-label">S (N×N)</div><div class="ghost-grid" id="ghost-s"></div><div class="ghost-x" id="ghost-x">✕</div><div class="ghost-label">P (N×N)</div></div>
     </div>
-
     <div class="no-sp-badge" id="no-sp">No S. No P. The N×N matrices never exist in HBM.</div>
   </div>
 </div>
-
-<!-- Status -->
-<div class="status-bar" id="status-bar">
-  Press <b>Play</b> to animate Flash Attention, or <b>Step</b> to advance one step at a time.
-</div>
-<div class="counter">HBM round trips: <span id="hbm-counter">0</span></div>
-
-<!-- Controls -->
+<div class="status-bar" id="status-bar">Press <b>Play</b> to animate Flash Attention, or <b>Step</b> to advance one step at a time.</div>
+<div class="counter">📥 HBM reads: <span id="hbm-reads">0</span> &nbsp;|&nbsp; 📤 HBM writes: <span id="hbm-writes">0</span></div>
 <div class="controls">
   <button class="btn-play" id="btn-play" onclick="play()">▶ Play</button>
-  <button class="btn-step" id="btn-back" onclick="stepBack()">← Back</button>
-  <button class="btn-step" id="btn-step" onclick="stepForward()">Step →</button>
-  <button class="btn-reset" id="btn-reset" onclick="resetAll()">↺ Reset</button>
-  <div class="speed-control">
-    <label for="speed">Speed:</label>
-    <input type="range" id="speed" min="200" max="2000" value="800" step="100">
-    <span id="speed-label">800ms</span>
-  </div>
+  <button class="btn-step" onclick="stepBack()">← Back</button>
+  <button class="btn-step" onclick="stepForward()">Step →</button>
+  <button class="btn-reset" onclick="resetAll()">↺ Reset</button>
+  <div class="speed-control"><label for="speed">Speed:</label><input type="range" id="speed" min="200" max="2000" value="800" step="100"><span id="speed-label">800ms</span></div>
 </div>
-
 <div class="legend">
   <div class="legend-item"><div class="legend-swatch" style="background:#1e40af"></div>Q</div>
   <div class="legend-item"><div class="legend-swatch" style="background:#92400e"></div>K</div>
@@ -676,454 +158,133 @@
   <div class="legend-item"><div class="legend-swatch" style="background:#1e293b;border:1px solid #334155"></div>O (empty)</div>
   <div class="legend-item"><div class="legend-swatch" style="border:1px dashed #ef4444;opacity:0.4"></div>S, P (never created)</div>
 </div>
-
 <script>
-// ── Data from the blog post ──
-const Q = [[1,0],[0,1],[1,1],[1,-1]];
-const K = [[0,1],[1,0],[1,1],[1,-1]];
-const V = [[1,2],[3,4],[5,6],[7,8]];
-const sqrtD = Math.sqrt(2);
-const tokens = ["the","cat","sat","down"];
-const BLOCK = 2, N = 4, d = 2;
+const Q=[[1,0],[0,1],[1,1],[1,-1]], K=[[0,1],[1,0],[1,1],[1,-1]], V=[[1,2],[3,4],[5,6],[7,8]];
+const N=4, d=2, Br=2, Bc=2, sqrtD=Math.sqrt(2);
+const ALL_STEPS=['step-load','step-score','step-local','step-gmax','step-rescale','step-accum','step-write'];
+const ALL_DETAILS=['detail-load','detail-score','detail-local','detail-gmax','detail-rescale','detail-accum','detail-write'];
+let currentStep=0, playing=false, playTimer=null, hbmR=0, hbmW=0, replaying=false;
+let st={m:[-Infinity,-Infinity],l:[0,0],O:[[0,0],[0,0]]};
+const finalO=[[0,0],[0,0],[0,0],[0,0]];
 
-// ── Build grids ──
-function buildGrid(id, data, cls) {
-  const g = document.getElementById(id);
-  g.innerHTML = '';
-  for (let r = 0; r < data.length; r++)
-    for (let c = 0; c < data[0].length; c++) {
-      const el = document.createElement('div');
-      el.className = 'cell ' + cls;
-      el.id = `${id}-${r}-${c}`;
-      el.textContent = data[r][c];
-      g.appendChild(el);
-    }
-}
-function buildOGrid() {
-  const g = document.getElementById('o-grid');
-  g.innerHTML = '';
-  for (let r = 0; r < N; r++)
-    for (let c = 0; c < d; c++) {
-      const el = document.createElement('div');
-      el.className = 'cell o';
-      el.id = `o-grid-${r}-${c}`;
-      el.textContent = '—';
-      g.appendChild(el);
-    }
-}
-function buildGhostGrid() {
-  const g = document.getElementById('ghost-s');
-  g.innerHTML = '';
-  for (let i = 0; i < N * N; i++) {
-    const el = document.createElement('div');
-    el.className = 'ghost-cell';
-    g.appendChild(el);
+// Build grids
+function bld(id,data,cls){const g=document.getElementById(id);g.innerHTML='';data.forEach((row,r)=>row.forEach((v,c)=>{const e=document.createElement('div');e.className='cell '+cls;e.id=`${id}-${r}-${c}`;e.textContent=v;g.appendChild(e);}))}
+function bldO(){const g=document.getElementById('o-grid');g.innerHTML='';for(let r=0;r<N;r++)for(let c=0;c<d;c++){const e=document.createElement('div');e.className='cell o';e.id=`o-grid-${r}-${c}`;e.textContent='—';g.appendChild(e);}}
+function bldGhost(){const g=document.getElementById('ghost-s');g.innerHTML='';for(let i=0;i<16;i++){const e=document.createElement('div');e.className='ghost-cell';g.appendChild(e);}}
+bld('q-grid',Q,'q');bld('k-grid',K,'k');bld('v-grid',V,'v');bldO();bldGhost();
+
+// Steps
+const steps=[];
+for(let qi=0;qi<N;qi+=Br){steps.push({t:'qblk',qi});for(let ki=0;ki<N;ki+=Bc){steps.push({t:'load',qi,ki},{t:'score',qi,ki},{t:'local',qi,ki},{t:'gmax',qi,ki},{t:'rescale',qi,ki},{t:'accum',qi,ki});}steps.push({t:'write',qi});}
+steps.push({t:'done'});
+
+// Helpers
+function dot(a,b){return a.reduce((s,v,i)=>s+v*b[i],0);}
+function sblk(qi,ki){const r=[];for(let i=0;i<Br;i++){const row=[];for(let j=0;j<Bc;j++)row.push(dot(Q[qi+i],K[ki+j])/sqrtD);r.push(row);}return r;}
+function fmt(v){return v.toFixed(3);}
+function fmtA(a){return'['+a.map(v=>v===-Infinity?'−∞':fmt(v)).join(', ')+']';}
+function fmtBlk(m,s){return m.slice(s,s+Br).map(r=>'['+r.join(',')+']').join(' ');}
+function spd(){return+document.getElementById('speed').value;}
+document.getElementById('speed').addEventListener('input',function(){document.getElementById('speed-label').textContent=this.value+'ms';});
+
+// Visual
+function clr(){ALL_STEPS.forEach(id=>document.getElementById(id).className='sram-step');ALL_DETAILS.forEach(id=>document.getElementById(id).textContent='');for(let r=0;r<N;r++)for(let c=0;c<d;c++)['q-grid','k-grid','v-grid'].forEach(g=>{const e=document.getElementById(`${g}-${r}-${c}`);if(e)e.classList.remove('active-block','dim');});document.querySelectorAll('.sram-unit').forEach(u=>u.classList.remove('computing'));}
+function hl(gid,sr,bs){for(let r=0;r<N;r++)for(let c=0;c<d;c++){const e=document.getElementById(`${gid}-${r}-${c}`);if(r>=sr&&r<sr+bs){e.classList.add('active-block');e.classList.remove('dim');}else{e.classList.add('dim');e.classList.remove('active-block');}}}
+function sramOn(){document.querySelectorAll('.sram-unit').forEach(u=>u.classList.add('computing'));}
+function sramOff(){document.querySelectorAll('.sram-unit').forEach(u=>u.classList.remove('computing'));}
+function stat(h){document.getElementById('status-bar').innerHTML=h;}
+function updSt(){document.getElementById('state-m').textContent=fmtA(st.m);document.getElementById('state-l').textContent=fmtA(st.l);document.getElementById('state-o').textContent=st.O.map(r=>'['+r.map(v=>fmt(v))+']').join(' ');}
+function incH(r,w){hbmR+=r;hbmW+=w;document.getElementById('hbm-reads').textContent=hbmR;document.getElementById('hbm-writes').textContent=hbmW;}
+function particles(dir,col){if(replaying)return;const a=document.getElementById('transfer-area');for(let i=0;i<5;i++){const p=document.createElement('div');p.className='data-particle '+dir;p.style.background=col;p.style.left=(15+Math.random()*70)+'%';p.style.animationDelay=(i*0.1)+'s';a.appendChild(p);setTimeout(()=>p.remove(),1000);}}
+function busL(t){document.getElementById('bus-dir').textContent=t;}
+function clrSB(){for(let r=0;r<Br;r++)for(let c=0;c<Bc;c++){const e=document.getElementById(`sb-${r}-${c}`);e.textContent='—';e.className='sblock-cell';}document.getElementById('sblock-status').textContent='empty';document.getElementById('sblock-status').className='sblock-status';}
+function fillSB(s){for(let r=0;r<Br;r++)for(let c=0;c<Bc;c++){const e=document.getElementById(`sb-${r}-${c}`);e.textContent=s[r][c].toFixed(2);e.className='sblock-cell filled';}document.getElementById('sblock-status').textContent='⚡ live';document.getElementById('sblock-status').className='sblock-status live';}
+function consSB(){for(let r=0;r<Br;r++)for(let c=0;c<Bc;c++)document.getElementById(`sb-${r}-${c}`).className='sblock-cell consumed';document.getElementById('sblock-status').textContent='✕ consumed';document.getElementById('sblock-status').className='sblock-status gone';}
+
+function exec(idx){
+  if(idx>=steps.length)return;
+  const s=steps[idx];
+  switch(s.t){
+  case'qblk':
+    st={m:[-Infinity,-Infinity],l:[0,0],O:[[0,0],[0,0]]};clr();clrSB();updSt();
+    document.getElementById('state-qblock').textContent=fmtBlk(Q,s.qi);
+    document.getElementById('state-kvblock').textContent='—';
+    document.getElementById('pass-indicator').textContent=`Q rows ${s.qi}–${s.qi+Br-1}`;
+    incH(1,0);stat(`<span class="sh">Outer loop:</span> 📥 Q rows ${s.qi}–${s.qi+Br-1} loaded from HBM`);break;
+  case'load':
+    clr();consSB();document.getElementById('step-load').className='sram-step active';
+    hl('q-grid',s.qi,Br);hl('k-grid',s.ki,Bc);hl('v-grid',s.ki,Bc);incH(2,0);
+    particles('up','#22d3ee');busL('↑ Loading K, V from HBM → SRAM');
+    document.getElementById('state-kvblock').textContent=`K:${fmtBlk(K,s.ki)} V:${fmtBlk(V,s.ki)}`;
+    const kp=(s.ki/Bc)+1,kt=N/Bc;
+    document.getElementById('pass-indicator').textContent=`Q rows ${s.qi}–${s.qi+Br-1} — KV block ${kp}/${kt}`;
+    document.getElementById('detail-load').textContent=`Q[${s.qi}:${s.qi+Br}] K[${s.ki}:${s.ki+Bc}] V[${s.ki}:${s.ki+Bc}]`;
+    stat(`<span class="sh">Load:</span> K,V blocks from HBM → SRAM (KV pass ${kp}/${kt})`);break;
+  case'score':{
+    clr();document.getElementById('step-score').className='sram-step active';sramOn();
+    hl('q-grid',s.qi,Br);hl('k-grid',s.ki,Bc);
+    const sb=sblk(s.qi,s.ki);fillSB(sb);
+    document.getElementById('detail-score').textContent=sb.map(r=>r.map(v=>v.toFixed(2)).join(',')).join(' | ');
+    busL('⚡ Computing in SRAM');stat(`<span class="sh">Step 1:</span> S_block computed in SRAM.`);break;}
+  case'local':{
+    clr();document.getElementById('step-local').className='sram-step active';sramOn();
+    const sb=sblk(s.qi,s.ki);
+    const mt=sb.map(r=>Math.max(...r));
+    const lt=sb.map((r,i)=>r.reduce((s,v)=>s+Math.exp(v-mt[i]),0));
+    st._mt=mt;st._lt=lt;st._sb=sb;
+    document.getElementById('detail-local').textContent=`m̃=[${mt.map(v=>fmt(v))}] l̃=[${lt.map(v=>fmt(v))}]`;
+    busL('⚡ Computing in SRAM');stat(`<span class="sh">Step 2:</span> Local max m̃=[${mt.map(v=>fmt(v))}], l̃=[${lt.map(v=>fmt(v))}]`);break;}
+  case'gmax':{
+    clr();document.getElementById('step-gmax').className='sram-step active';sramOn();
+    const mt=st._mt,om=st.m.slice(),nm=mt.map((v,i)=>Math.max(om[i],v));
+    st._nm=nm;
+    document.getElementById('detail-gmax').textContent=`m_new=[${nm.map(v=>fmt(v))}]`;
+    busL('⚡ Computing in SRAM');
+    stat(`<span class="sh">Step 3:</span> m_new=max([${om.map(v=>v===-Infinity?'−∞':fmt(v))}],[${mt.map(v=>fmt(v))}])=[${nm.map(v=>fmt(v))}]`);break;}
+  case'rescale':{
+    clr();document.getElementById('step-rescale').className='sram-step active';sramOn();
+    const nm=st._nm,om=st.m.slice(),first=om.every(v=>v===-Infinity);
+    if(first){st.l=[0,0];st.O=[[0,0],[0,0]];document.getElementById('detail-rescale').textContent='×0 (first block)';stat(`<span class="sh">Step 4:</span> First block — scale=exp(−∞−${fmt(nm[0])})=0`);}
+    else{const sc=om.map((v,i)=>Math.exp(v-nm[i]));for(let r=0;r<Br;r++){st.l[r]*=sc[r];for(let c=0;c<d;c++)st.O[r][c]*=sc[r];}
+    document.getElementById('detail-rescale').textContent=`×[${sc.map(v=>fmt(v))}]`;stat(`<span class="sh">Step 4:</span> Rescale by [${sc.map(v=>fmt(v))}]`);}
+    st.m=nm.slice();updSt();busL('⚡ Computing in SRAM');break;}
+  case'accum':{
+    clr();document.getElementById('step-accum').className='sram-step active';sramOn();hl('v-grid',s.ki,Bc);
+    const sb=st._sb,mt=st._mt,lt=st._lt,m=st.m,vb=V.slice(s.ki,s.ki+Bc);
+    for(let r=0;r<Br;r++){st.l[r]+=Math.exp(mt[r]-m[r])*lt[r];for(let c=0;c<Bc;c++){const w=Math.exp(sb[r][c]-m[r]);for(let dd=0;dd<d;dd++)st.O[r][dd]+=w*vb[c][dd];}}
+    updSt();document.getElementById('detail-accum').textContent=`l=[${st.l.map(v=>fmt(v))}]`;
+    busL('⚡ Computing in SRAM');stat(`<span class="sh">Step 5:</span> l+=exp(m̃−m_new)×l̃, Õ+=exp(S−m_new)×V`);break;}
+  case'write':{
+    clr();consSB();document.getElementById('step-write').className='sram-step active';incH(0,1);
+    particles('down','#10b981');busL('↓ Writing O from SRAM → HBM');
+    for(let r=s.qi;r<s.qi+Br;r++){let sc=[];for(let c=0;c<N;c++)sc.push(dot(Q[r],K[c])/sqrtD);const mx=Math.max(...sc);let ex=sc.map(v=>Math.exp(v-mx)),sm=ex.reduce((a,b)=>a+b,0),pr=ex.map(e=>e/sm);finalO[r]=[0,0];for(let c=0;c<N;c++){finalO[r][0]+=pr[c]*V[c][0];finalO[r][1]+=pr[c]*V[c][1];}
+    for(let c=0;c<d;c++){const e=document.getElementById(`o-grid-${r}-${c}`);e.textContent=finalO[r][c].toFixed(2);e.className='cell o written writing';}}
+    document.getElementById('detail-write').textContent=`rows ${s.qi}–${s.qi+Br-1}`;
+    stat(`<span class="sh">Step 6:</span> O=Õ/l → HBM rows ${s.qi}–${s.qi+Br-1}. <span class="sg">Only O (N×d) touches HBM!</span>`);break;}
+  case'done':
+    clr();sramOff();busL('10× slower than SRAM');document.getElementById('pass-indicator').textContent='';
+    stat(`<span class="sg">✓ Done!</span> 📥 ${hbmR} reads, 📤 ${hbmW} writes. No N×N matrix ever existed in HBM.`);
+    document.getElementById('no-sp').className='no-sp-badge success';document.getElementById('no-sp').innerHTML='✓ No S. No P. N×N matrices <b>never existed</b>. Memory: O(N), not O(N²).';
+    document.getElementById('ghost-x').style.color='#10b981';document.getElementById('ghost-x').textContent='✓';
+    playing=false;document.getElementById('btn-play').textContent='▶ Play';break;
   }
 }
 
-buildGrid('q-grid', Q, 'q');
-buildGrid('k-grid', K, 'k');
-buildGrid('v-grid', V, 'v');
-buildOGrid();
-buildGhostGrid();
-
-// ── Animation state ──
-let currentStep = 0, playing = false, playTimer = null, hbmTrips = 0;
-let qBlockState = { m: -Infinity, l: 0, O: [0,0] };
-const finalO = Array.from({length:N}, () => [0,0]);
-
-// ── Build step sequence ──
-const steps = [];
-for (let qi = 0; qi < N; qi += BLOCK) {
-  steps.push({ type: 'new-q-block', qi });
-  for (let ki = 0; ki < N; ki += BLOCK) {
-    steps.push({ type: 'load', qi, ki });
-    steps.push({ type: 'score', qi, ki });
-    steps.push({ type: 'max', qi, ki });
-    steps.push({ type: 'rescale', qi, ki });
-    steps.push({ type: 'accum', qi, ki });
-  }
-  steps.push({ type: 'write', qi });
-}
-steps.push({ type: 'done' });
-
-// ── Helpers ──
-function dot(a, b) { return a[0]*b[0] + a[1]*b[1]; }
-function computeScoreBlock(qi, ki) {
-  const r = [];
-  for (let i = 0; i < BLOCK; i++) {
-    const row = [];
-    for (let j = 0; j < BLOCK; j++) row.push(dot(Q[qi+i], K[ki+j]) / sqrtD);
-    r.push(row);
-  }
-  return r;
-}
-function fmt(v) { return typeof v === 'number' ? v.toFixed(3) : v; }
-function fmtArr(a) { return '[' + a.map(x => x.toFixed(3)).join(', ') + ']'; }
-function fmtBlock(mat, start) {
-  return mat.slice(start, start+BLOCK).map(r => '[' + r.join(',') + ']').join(' ');
-}
-function getSpeed() { return parseInt(document.getElementById('speed').value); }
-
-document.getElementById('speed').addEventListener('input', function() {
-  document.getElementById('speed-label').textContent = this.value + 'ms';
-});
-
-// ── Visual helpers ──
-const stepIds = ['step-load','step-score','step-max','step-rescale','step-accum','step-write'];
-const detailIds = ['detail-load','detail-score','detail-max','detail-rescale','detail-accum','detail-write'];
-
-function clearHighlights() {
-  stepIds.forEach(id => document.getElementById(id).className = 'sram-step');
-  detailIds.forEach(id => document.getElementById(id).textContent = '');
-  for (let r = 0; r < N; r++)
-    for (let c = 0; c < d; c++)
-      ['q-grid','k-grid','v-grid'].forEach(g => {
-        const el = document.getElementById(`${g}-${r}-${c}`);
-        if (el) el.classList.remove('active-block','dim','loading');
-      });
-  document.querySelectorAll('.sram-unit').forEach(u => {
-    u.classList.remove('active','computing');
-  });
-}
-
-function highlightBlock(gridId, startRow) {
-  for (let r = 0; r < N; r++)
-    for (let c = 0; c < d; c++) {
-      const el = document.getElementById(`${gridId}-${r}-${c}`);
-      if (r >= startRow && r < startRow + BLOCK) {
-        el.classList.add('active-block');
-        el.classList.remove('dim');
-      } else {
-        el.classList.add('dim');
-        el.classList.remove('active-block');
-      }
-    }
-}
-
-function activateSRAM() {
-  document.querySelectorAll('.sram-unit').forEach(u => u.classList.add('computing'));
-}
-function deactivateSRAM() {
-  document.querySelectorAll('.sram-unit').forEach(u => u.classList.remove('computing'));
-}
-
-function setStatus(html) { document.getElementById('status-bar').innerHTML = html; }
-
-function updateState() {
-  document.getElementById('state-m').textContent = qBlockState.m === -Infinity ? '−∞' : fmt(qBlockState.m);
-  document.getElementById('state-l').textContent = fmt(qBlockState.l);
-  document.getElementById('state-o').textContent = fmtArr(qBlockState.O);
-}
-
-function incHBM(n) {
-  hbmTrips += n;
-  document.getElementById('hbm-counter').textContent = hbmTrips;
-}
-
-// ── Data transfer particles ──
-let replaying = false;
-function spawnParticles(direction, color) {
-  if (replaying) return;
-  const area = document.getElementById('transfer-area');
-  for (let i = 0; i < 5; i++) {
-    const p = document.createElement('div');
-    p.className = 'data-particle ' + direction;
-    p.style.background = color;
-    p.style.left = (15 + Math.random() * 70) + '%';
-    p.style.animationDelay = (i * 0.1) + 's';
-    area.appendChild(p);
-    setTimeout(() => p.remove(), 1000);
-  }
-}
-
-function setBusLabel(text) {
-  document.getElementById('bus-dir').textContent = text;
-}
-
-// ── S_block visual helpers ──
-function clearSBlock() {
-  for (let r = 0; r < BLOCK; r++)
-    for (let c = 0; c < BLOCK; c++) {
-      const el = document.getElementById(`sb-${r}-${c}`);
-      el.textContent = '—';
-      el.className = 'sblock-cell';
-    }
-  document.getElementById('sblock-status').textContent = 'empty';
-  document.getElementById('sblock-status').className = 'sblock-status';
-}
-
-function fillSBlock(sB) {
-  for (let r = 0; r < BLOCK; r++)
-    for (let c = 0; c < BLOCK; c++) {
-      const el = document.getElementById(`sb-${r}-${c}`);
-      el.textContent = sB[r][c].toFixed(2);
-      el.className = 'sblock-cell filled';
-    }
-  document.getElementById('sblock-status').textContent = '⚡ live in SRAM';
-  document.getElementById('sblock-status').className = 'sblock-status live';
-}
-
-function consumeSBlock() {
-  for (let r = 0; r < BLOCK; r++)
-    for (let c = 0; c < BLOCK; c++) {
-      document.getElementById(`sb-${r}-${c}`).className = 'sblock-cell consumed';
-    }
-  document.getElementById('sblock-status').textContent = '✕ consumed';
-  document.getElementById('sblock-status').className = 'sblock-status gone';
-}
-
-// ── Execute a step ──
-function executeStep(idx) {
-  if (idx >= steps.length) return;
-  const s = steps[idx];
-
-  switch (s.type) {
-    case 'new-q-block': {
-      qBlockState = { m: -Infinity, l: 0, O: [0,0] };
-      clearHighlights();
-      clearSBlock();
-      updateState();
-      document.getElementById('state-qblock').textContent = fmtBlock(Q, s.qi);
-      document.getElementById('state-kvblock').textContent = '—';
-      document.getElementById('pass-indicator').textContent = `Q rows ${s.qi}–${s.qi+BLOCK-1} — starting inner loop over KV blocks`;
-      setStatus(`<span class="sh">Outer loop:</span> Processing Q rows ${s.qi}–${s.qi+BLOCK-1}: ${fmtBlock(Q, s.qi)}`);
-      break;
-    }
-
-    case 'load': {
-      clearHighlights();
-      consumeSBlock();
-      document.getElementById('step-load').className = 'sram-step active';
-      highlightBlock('q-grid', s.qi);
-      highlightBlock('k-grid', s.ki);
-      highlightBlock('v-grid', s.ki);
-      incHBM(1);
-      spawnParticles('up', '#22d3ee');
-      setBusLabel('↑ Loading Q, K, V blocks from HBM → SRAM');
-      document.getElementById('state-kvblock').textContent = `K:${fmtBlock(K, s.ki)} V:${fmtBlock(V, s.ki)}`;
-      const kvPass = (s.ki / BLOCK) + 1;
-      const kvTotal = N / BLOCK;
-      document.getElementById('pass-indicator').textContent = `Q rows ${s.qi}–${s.qi+BLOCK-1} — KV block ${kvPass} of ${kvTotal}`;
-      document.getElementById('detail-load').textContent = `Q[${s.qi}:${s.qi+BLOCK}] K[${s.ki}:${s.ki+BLOCK}] V[${s.ki}:${s.ki+BLOCK}]`;
-      setStatus(`<span class="sh">Step 1:</span> Load blocks from HBM → SRAM (KV pass ${kvPass}/${kvTotal}). This is the slow part (~2 TB/s).`);
-      break;
-    }
-
-    case 'score': {
-      clearHighlights();
-      document.getElementById('step-score').className = 'sram-step active';
-      activateSRAM();
-      highlightBlock('q-grid', s.qi);
-      highlightBlock('k-grid', s.ki);
-      const sB = computeScoreBlock(s.qi, s.ki);
-      fillSBlock(sB);
-      const sStr = sB.map(r => r.map(v => v.toFixed(2)).join(',')).join(' | ');
-      document.getElementById('detail-score').textContent = sStr;
-      setBusLabel('⚡ Computing in SRAM — no HBM traffic');
-      setStatus(`<span class="sh">Step 2:</span> S_block computed in SRAM. <span class="sw">Never written to HBM — never leaves the chip!</span>`);
-      break;
-    }
-
-    case 'max': {
-      clearHighlights();
-      document.getElementById('step-max').className = 'sram-step active';
-      activateSRAM();
-      const sB = computeScoreBlock(s.qi, s.ki);
-      const lm = Math.max(...sB.flat());
-      const oldM = qBlockState.m;
-      const newM = Math.max(oldM, lm);
-      qBlockState._newM = newM;
-      qBlockState._lm = lm;
-      qBlockState._sB = sB;
-      document.getElementById('detail-max').textContent = `m̃=${fmt(lm)} → ${fmt(newM)}`;
-      setBusLabel('⚡ Computing in SRAM — no HBM traffic');
-      setStatus(`<span class="sh">Step 3:</span> Local max m̃=${fmt(lm)}, global m = max(${oldM===-Infinity?'−∞':fmt(oldM)}, ${fmt(lm)}) = ${fmt(newM)}`);
-      break;
-    }
-
-    case 'rescale': {
-      clearHighlights();
-      document.getElementById('step-rescale').className = 'sram-step active';
-      activateSRAM();
-      const newM = qBlockState._newM;
-      const oldM = qBlockState.m;
-      if (oldM === -Infinity) {
-        qBlockState.l = 0;
-        qBlockState.O = [0,0];
-        document.getElementById('detail-rescale').textContent = `×0 (no prior)`;
-        setStatus(`<span class="sh">Step 4:</span> First block — scale = exp(−∞ − ${fmt(newM)}) = 0. Nothing to rescale.`);
-      } else {
-        const sc = Math.exp(oldM - newM);
-        qBlockState.l *= sc;
-        qBlockState.O[0] *= sc;
-        qBlockState.O[1] *= sc;
-        document.getElementById('detail-rescale').textContent = `×${fmt(sc)}`;
-        setStatus(`<span class="sh">Step 4:</span> Rescale by exp(${fmt(oldM)}−${fmt(newM)}) = ${fmt(sc)}. Previous results shrink.`);
-      }
-      qBlockState.m = newM;
-      updateState();
-      setBusLabel('⚡ Computing in SRAM — no HBM traffic');
-      break;
-    }
-
-    case 'accum': {
-      clearHighlights();
-      document.getElementById('step-accum').className = 'sram-step active';
-      activateSRAM();
-      highlightBlock('v-grid', s.ki);
-      const sB = qBlockState._sB;
-      const m = qBlockState.m;
-      const vB = V.slice(s.ki, s.ki+BLOCK);
-      // Accumulate for first row of Q block (representative)
-      for (let c = 0; c < BLOCK; c++) {
-        const w = Math.exp(sB[0][c] - m);
-        qBlockState.l += w;
-        qBlockState.O[0] += w * vB[c][0];
-        qBlockState.O[1] += w * vB[c][1];
-      }
-      updateState();
-      document.getElementById('detail-accum').textContent = `Õ→${fmtArr(qBlockState.O)}`;
-      setBusLabel('⚡ Computing in SRAM — no HBM traffic');
-      setStatus(`<span class="sh">Step 5:</span> exp(S−m)×V accumulated into Õ. S_block used here — discarded next.`);
-      break;
-    }
-
-    case 'write': {
-      clearHighlights();
-      consumeSBlock();
-      document.getElementById('step-write').className = 'sram-step active';
-      incHBM(1);
-      spawnParticles('down', '#10b981');
-      setBusLabel('↓ Writing O block from SRAM → HBM');
-      // Compute correct O
-      for (let r = s.qi; r < s.qi+BLOCK; r++) {
-        let sc = [];
-        for (let c = 0; c < N; c++) sc.push(dot(Q[r], K[c]) / sqrtD);
-        const mx = Math.max(...sc);
-        let ex = sc.map(s => Math.exp(s-mx));
-        let sm = ex.reduce((a,b)=>a+b,0);
-        let pr = ex.map(e=>e/sm);
-        finalO[r] = [0,0];
-        for (let c = 0; c < N; c++) {
-          finalO[r][0] += pr[c]*V[c][0];
-          finalO[r][1] += pr[c]*V[c][1];
-        }
-        for (let c = 0; c < d; c++) {
-          const el = document.getElementById(`o-grid-${r}-${c}`);
-          el.textContent = finalO[r][c].toFixed(2);
-          el.className = 'cell o written writing';
-        }
-      }
-      const names = tokens.slice(s.qi, s.qi+BLOCK).map(t=>`"${t}"`).join(', ');
-      document.getElementById('detail-write').textContent = `rows ${s.qi}–${s.qi+BLOCK-1}`;
-      setStatus(`<span class="sh">Step 6:</span> O = Õ/l written to HBM for rows ${s.qi}–${s.qi+BLOCK-1} (${names}). <span class="sg">Only O (N×d) touches HBM!</span>`);
-      break;
-    }
-
-    case 'done': {
-      clearHighlights();
-      deactivateSRAM();
-      setBusLabel('10× slower than SRAM');
-      document.getElementById('pass-indicator').textContent = '';
-      setStatus(`<span class="sg">✓ Done!</span> Exact same result as standard attention. No N×N matrix ever existed in HBM. ${hbmTrips} HBM round trips total.`);
-      const badge = document.getElementById('no-sp');
-      badge.className = 'no-sp-badge success';
-      badge.innerHTML = '✓ No S. No P. N×N matrices <b>never existed</b>. Memory: O(N), not O(N²).';
-      document.getElementById('ghost-x').style.color = '#10b981';
-      document.getElementById('ghost-x').textContent = '✓';
-      playing = false;
-      document.getElementById('btn-play').textContent = '▶ Play';
-      break;
-    }
-  }
-}
-
-// ── Controls ──
-function stepForward() {
-  if (currentStep >= steps.length) return;
-  executeStep(currentStep);
-  currentStep++;
-}
-
-function stepBack() {
-  if (currentStep <= 0) return;
-  // Target is one step earlier than current
-  const target = currentStep - 1;
-  // Reset everything to initial state
-  hbmTrips = 0;
-  qBlockState = { m: -Infinity, l: 0, O: [0,0] };
-  document.getElementById('hbm-counter').textContent = '0';
-  clearHighlights();
-  deactivateSRAM();
-  clearSBlock();
-  buildOGrid();
-  updateState();
-  document.getElementById('state-qblock').textContent = '—';
-  document.getElementById('state-kvblock').textContent = '—';
-  document.getElementById('pass-indicator').textContent = '';
-  setBusLabel('10× slower than SRAM');
-  const badge = document.getElementById('no-sp');
-  badge.className = 'no-sp-badge';
-  badge.innerHTML = 'No S. No P. The N×N matrices never exist in HBM.';
-  document.getElementById('ghost-x').style.color = '#ef4444';
-  document.getElementById('ghost-x').textContent = '✕';
-  // Replay all steps up to target silently (no particles)
-  replaying = true;
-  for (let i = 0; i < target; i++) {
-    executeStep(i);
-  }
-  replaying = false;
-  currentStep = target;
-  if (target === 0) {
-    setStatus('Press <b>Play</b> to animate Flash Attention, or <b>Step</b> to advance one step at a time.');
-  }
-}
-
-function play() {
-  if (playing) {
-    playing = false;
-    clearTimeout(playTimer);
-    document.getElementById('btn-play').textContent = '▶ Play';
-    return;
-  }
-  playing = true;
-  document.getElementById('btn-play').textContent = '⏸ Pause';
-  (function tick() {
-    if (!playing || currentStep >= steps.length) {
-      playing = false;
-      document.getElementById('btn-play').textContent = '▶ Play';
-      return;
-    }
-    stepForward();
-    playTimer = setTimeout(tick, getSpeed());
-  })();
-}
-
-function resetAll() {
-  playing = false;
-  clearTimeout(playTimer);
-  currentStep = 0;
-  hbmTrips = 0;
-  qBlockState = { m: -Infinity, l: 0, O: [0,0] };
-  document.getElementById('hbm-counter').textContent = '0';
-  document.getElementById('btn-play').textContent = '▶ Play';
-  clearHighlights();
-  deactivateSRAM();
-  clearSBlock();
-  buildOGrid();
-  updateState();
-  document.getElementById('state-qblock').textContent = '—';
-  document.getElementById('state-kvblock').textContent = '—';
-  document.getElementById('pass-indicator').textContent = '';
-  setBusLabel('10× slower than SRAM');
-  const badge = document.getElementById('no-sp');
-  badge.className = 'no-sp-badge';
-  badge.innerHTML = 'No S. No P. The N×N matrices never exist in HBM.';
-  document.getElementById('ghost-x').style.color = '#ef4444';
-  document.getElementById('ghost-x').textContent = '✕';
-  setStatus('Press <b>Play</b> to animate Flash Attention, or <b>Step</b> to advance one step at a time.');
-}
+function stepForward(){if(currentStep>=steps.length)return;exec(currentStep);currentStep++;}
+function doReset(){playing=false;clearTimeout(playTimer);currentStep=0;hbmR=0;hbmW=0;
+  st={m:[-Infinity,-Infinity],l:[0,0],O:[[0,0],[0,0]]};
+  document.getElementById('hbm-reads').textContent='0';document.getElementById('hbm-writes').textContent='0';
+  document.getElementById('btn-play').textContent='▶ Play';clr();sramOff();clrSB();bldO();updSt();
+  document.getElementById('state-qblock').textContent='—';document.getElementById('state-kvblock').textContent='—';
+  document.getElementById('pass-indicator').textContent='';busL('10× slower than SRAM');
+  const b=document.getElementById('no-sp');b.className='no-sp-badge';b.innerHTML='No S. No P. The N×N matrices never exist in HBM.';
+  document.getElementById('ghost-x').style.color='#ef4444';document.getElementById('ghost-x').textContent='✕';
+  stat('Press <b>Play</b> to animate Flash Attention, or <b>Step</b> to advance one step at a time.');}
+function stepBack(){if(currentStep<=0)return;const t=currentStep-1;doReset();replaying=true;for(let i=0;i<t;i++)exec(i);replaying=false;currentStep=t;if(t===0)stat('Press <b>Play</b> to animate Flash Attention, or <b>Step</b> to advance one step at a time.');}
+function resetAll(){doReset();}
+function play(){if(playing){playing=false;clearTimeout(playTimer);document.getElementById('btn-play').textContent='▶ Play';return;}
+  playing=true;document.getElementById('btn-play').textContent='⏸ Pause';
+  (function tick(){if(!playing||currentStep>=steps.length){playing=false;document.getElementById('btn-play').textContent='▶ Play';return;}stepForward();playTimer=setTimeout(tick,spd());})();}
 </script>
 </body>
 </html>
